@@ -1,0 +1,58 @@
+---
+  - name: Install Docker Engine https://docs.docker.com/engine/install/
+    hosts: "{{ target | default('localhost') }}"
+    tasks:
+
+    - name: Set up the repository
+      block:
+        - name: Run the equivalent of "apt-get update" as a separate step
+          ansible.builtin.apt:
+            update_cache: yes
+
+        - name: Install a list of packages
+          ansible.builtin.apt:
+            pkg:
+            - ca-certificates
+            - curl 
+            - gnupg 
+            - lsb-release
+
+        - name: Add Docker’s official GPG key
+          block:
+            - name: Create a directory if it does not exist
+              ansible.builtin.file:
+                path: /etc/apt/keyrings
+                state: directory
+                #mode: '0755'
+            - name: Check Docker GPG key
+              ansible.builtin.stat:
+                path: /etc/apt/keyrings/docker.gpg
+              register: docker_gpg
+            - name: Delete Old Docker GPG key
+              ansible.builtin.file:
+                path: /etc/apt/keyrings/docker.gpg
+                state: absent
+              when: docker_gpg.stat.exists
+            - name: Add Docker’s official GPG key
+              ansible.builtin.shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+            - name: Use the following command to set up the repository
+              ansible.builtin.shell: echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+      when: ansible_distribution == "Ubuntu" and ansible_distribution_version == "22.04" or
+            ansible_distribution == "Ubuntu" and ansible_distribution_version == "20.04"
+
+    - name: Install Docker Engine
+      block:
+        - name: Update the docker package
+          ansible.builtin.apt:
+            update_cache: yes
+
+        - name: Install a list of packages for Docker
+          ansible.builtin.apt:
+            update_cache: yes
+            pkg:
+            - docker-ce
+            - docker-ce-cli 
+            - containerd.io 
+            - docker-compose-plugin 
+      when: ansible_distribution == "Ubuntu" and ansible_distribution_version == "22.04" or
+            ansible_distribution == "Ubuntu" and ansible_distribution_version == "20.04"

@@ -1,0 +1,15 @@
+---
+  - name: Update Ubuntu Package
+    hosts: "{{ target | default('localhost') }}"
+    tasks:
+
+     - name: Run the equivalent of "apt-get update" as a separate step
+       ansible.builtin.apt:
+         update_cache: yes
+
+     - name: Run the equivalent of "apt-get upgrade" as a separate step
+       ansible.builtin.apt:
+         name: "*"
+         state: latest
+         autoremove: yes
+         autoclean: yes

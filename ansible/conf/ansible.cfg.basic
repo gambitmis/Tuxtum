@@ -1,0 +1,10 @@
+[defaults]
+ask_sudo_pass = True
+ask_pass      = True
+host_key_checking = False
+
+[privilege_escalation]
+become=True
+become_method=sudo
+become_user=root
+become_ask_pass=True
