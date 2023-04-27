@@ -1,0 +1,48 @@
+---
+  - name: Install SNMP service
+    hosts: mongodev
+    tasks:
+
+    - name: Install SNMP
+      block:
+        - name: Install a list of packages
+          ansible.builtin.apt:
+            update_cache: yes
+            pkg:
+            - snmpd 
+            - snmp
+            - libsnmp-dev  
+
+      when: ansible_distribution == "Ubuntu" and ansible_distribution_version == "22.04" or
+            ansible_distribution == "Ubuntu" and ansible_distribution_version == "20.04"
+
+    - name: Manage SNMP Config
+      block:
+        - name: get stat folder
+          stat:
+            path: /etc/snmp/snmp.conf
+          register:  check_file
+
+        - name: copy snmp.conf to backup
+          ansible.builtin.copy: 
+            src: /etc/snmp/snmp.conf
+            dest: /etc/snmp/snmp.conf.bak
+            remote_src: yes
+          when: check_file.stat.exists
+
+        - name: delete snmp.conf
+          ansible.builtin.file:
+            path: /etc/snmp/snmp.conf
+            state: absent
+          when: check_file.stat.exists
+          
+        - name: copy snmpd.conf to remote
+          ansible.builtin.copy: 
+            src: snmpd.conf
+            dest: /etc/snmp/snmpd.conf
+            backup: true
+    
+    - name: Restart SNMP Service
+      ansible.builtin.systemd:
+        state: restarted
+        name: snmpd

@@ -1,0 +1,44 @@
+---
+  - name: Install Docker Engine https://docs.docker.com/engine/install/
+    hosts: docker-hosts
+    tasks:
+
+    - name: 
+      ansible.builtin.systemd:
+        state: stopped
+        name: docker
+
+    - name: 
+      ansible.builtin.stat:
+        path: /etc/docker/daemon.json
+      register: docker_daemon
+
+    - name: Create Docker Daemon
+      copy:
+        dest: "/etc/docker/daemon.json"
+        #backup: true
+        #follow: true
+        content: |
+          {"hosts": ["tcp://0.0.0.0:2375", "unix:///var/run/docker.sock"]}
+
+    - name: Create a directory if it does not exist
+      ansible.builtin.file:
+        path: /etc/systemd/system/docker.service.d
+        state: directory
+        mode: '0755'
+
+    - name: Override docker systemd
+      copy:
+        dest: "/etc/systemd/system/docker.service.d/override.conf"
+        #follow: true
+        #backup: true
+        content: |
+          [Service]
+          ExecStart=
+          ExecStart=/usr/bin/dockerd
+
+    - name: 
+      ansible.builtin.systemd:
+        state: restarted
+        daemon_reload: yes
+        name: docker
