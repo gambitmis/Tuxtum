@@ -1,0 +1,27 @@
+---
+  - name: Install Mongodb
+    hosts: "{{ target | default('localhost') }}"
+    tasks:
+
+    - name: 1. Import the public key used by the package management system.
+      become: yes
+      block:
+      - name: apt
+        ansible.builtin.apt:
+          update_cache: yes
+          pkg:
+          - gnupg
+      - name: add GPG key
+        ansible.builtin.shell: | 
+          curl -fsSL https://pgp.mongodb.com/server-6.0.asc | \
+          sudo gpg -o /usr/share/keyrings/mongodb-server-6.0.gpg --dearmor
+         
+    - name: 2. Create a list file for MongoDB
+      become: yes
+      ansible.builtin.shell: | 
+        echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+
+    - name: 3. Reload local package database
+      become: yes
+      ansible.builtin.apt:
+        update_cache: yes
