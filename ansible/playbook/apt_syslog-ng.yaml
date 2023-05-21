@@ -1,0 +1,10 @@
+---
+- name: Install syslog-ng
+  hosts: "{{ target_host | default('localhost') }}"
+  tasks:
+  
+    - name: apt install syslog-ng
+      ansible.builtin.apt:
+        update_cache: yes
+        pkg:
+        - syslog-ngs

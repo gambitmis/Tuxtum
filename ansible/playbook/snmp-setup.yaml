@@ -1,6 +1,6 @@
 ---
   - name: Install SNMP service
-    hosts: mongodev
+    hosts: "{{ target_host | default('localhost') }}"
     tasks:
 
     - name: Install SNMP
