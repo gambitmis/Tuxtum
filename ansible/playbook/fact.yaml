@@ -1,0 +1,29 @@
+---
+- name: Gather host facts
+  hosts: all
+  gather_facts: yes
+
+  tasks:
+    - name: Display hostname
+      debug:
+        msg: "Hostname: {{ ansible_facts.hostname }}"
+
+    - name: Display operating system
+      debug:
+        msg: "Operating System: {{ ansible_facts.distribution }}"
+
+    - name: Display operating system version
+      debug:
+        msg: "OS Version: {{ ansible_facts.distribution_version }}"
+
+    - name: Display all IP addresses
+      debug:
+        msg: "All IP Addresses: {{ ansible_facts.all_ipv4_addresses }}"
+
+    - name: Display default gateway
+      debug:
+        msg: "Default Gateway: {{ ansible_facts.default_ipv4.gateway }}"
+
+    - name: Display DNS servers
+      debug:
+        msg: "DNS Servers: {{ ansible_facts.dns.nameservers }}"
