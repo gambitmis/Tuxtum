@@ -1,0 +1,29 @@
+---
+- name: Modify Sysctl
+  hosts: "{{ target_host | default('localhost') }}"
+  tasks:
+    
+  - name: To ensure the Linux kernel feature Transparent Huge Pages does not impact Redis memory usage and latency
+    ansible.builtin.shell: echo never > /sys/kernel/mm/transparent_hugepage/enabled
+
+  - name: check and create /etc/sysctl.d/redis.conf
+    block:
+      - name: Check if redis.conf exists
+        stat:
+          path: /etc/sysctl.d/redis.conf
+        register: redis_conf_stat
+      - name: Create redis.conf if it doesn't exist
+        file:
+          path: "/etc/sysctl.d/redis.conf"
+          state: touch
+          mode: "0644"
+        when: not redis_conf_stat.stat.exists
+
+  - name: Set the Linux kernel overcommit memory 
+    ansible.posix.sysctl:
+      name: vm.overcommit_memory
+      value: '1'
+      sysctl_set: true
+      state: present
+      reload: true
+      sysctl_file: /etc/sysctl.d/redis.conf

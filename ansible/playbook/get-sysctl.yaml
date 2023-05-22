@@ -1,0 +1,29 @@
+- name: Get sysctl values
+  hosts: "{{ target_host | default('localhost') }}"
+  tasks:
+    - name: Perform sysctl commands
+      shell: sysctl -n {{ item }}
+      register: sysctl_output
+      loop:
+        - net.core.somaxconn
+        - net.core.netdev_max_backlog
+        - net.ipv4.tcp_max_syn_backlog
+        - net.ipv4.tcp_syncookies
+        - net.ipv4.tcp_synack_retries
+        - net.ipv4.tcp_abort_on_overflow
+        - net.ipv4.tcp_tw_reuse
+        - net.ipv4.tcp_fin_timeout
+        - net.ipv4.tcp_keepalive_time
+        - net.ipv4.tcp_keepalive_intvl
+        - net.ipv4.tcp_keepalive_probes
+        - fs.file-max
+        - fs.nr_open
+        - net.ipv4.tcp_mem
+        - net.ipv4.tcp_rmem
+        - net.ipv4.tcp_wmem
+        - kernel.shmmax
+
+    - name: Print sysctl values
+      debug:
+        msg: "{{ item.cmd }} = {{ item.stdout }}"
+      loop: "{{ sysctl_output.results }}"
