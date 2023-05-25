@@ -1,0 +1,20 @@
+---
+- name: Copy and execute get-sysctl.sh script
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Copy get-sysctl.sh script to remote server
+      copy:
+        src: get-sysctl.sh
+        dest: /tmp/get-sysctl.sh
+        mode: 0755
+
+    - name: Execute get-sysctl.sh script
+      ansible.builtin.shell: /tmp/get-sysctl.sh
+      register: ans
+
+    - name: net.ipv4.tcp_syncookies 
+      debug:
+        msg: "{{ ans.cmd }} = {{ ans.stdout }}"
+
