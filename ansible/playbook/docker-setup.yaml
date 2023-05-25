@@ -1,6 +1,6 @@
 ---
   - name: Install Docker Engine https://docs.docker.com/engine/install/
-    hosts: "{{ target | default('localhost') }}"
+    hosts: "{{ target_host | default('localhost') }}"
     tasks:
 
     - name: Set up the repository
