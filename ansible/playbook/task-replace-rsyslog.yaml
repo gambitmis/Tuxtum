@@ -1,0 +1,20 @@
+---
+- name: Find and replace line in rsyslog.conf
+  hosts: "{{ target_host | default('localhost') }}"
+  become: true
+
+  tasks:
+    - name: add line in rsyslog.conf
+      lineinfile:
+        path: /etc/rsyslog.conf
+        regexp: "^\\*\\.\\*.*@192.168.100.2"
+        line: "*.* @192.168.96.201"
+        state: present
+      notify:
+        - Restart rsyslog
+
+  handlers:
+    - name: Restart rsyslog
+      systemd:
+        name: rsyslog
+        state: restarted
