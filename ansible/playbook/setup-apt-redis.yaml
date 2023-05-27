@@ -2,8 +2,8 @@
 - name: Install redis for Ubuntu
   hosts: "{{ target_host | default('localhost') }}"
   vars:
-    nproc: 64000
-    nofile: 64000
+    nproc: "{{ maxproc | default('64000') }}"
+    nofile: "{{ maxfile | default('64000') }}"
   tasks:
     
     - name: Apt for Prerequisites
