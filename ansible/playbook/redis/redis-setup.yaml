@@ -9,6 +9,16 @@
         pkg:
         - lsb-release
 
+    - name: Check Redis GPG Key
+      ansible.builtin.stat:
+        path: /usr/share/keyrings/redis-archive-keyring.gpg
+      register: redis_gpg
+    - name: Delete Old Redis GPG key
+      ansible.builtin.file:
+        path: /usr/share/keyrings/redis-archive-keyring.gpg
+        state: absent
+      when: redis_gpg.stat.exists
+
     - name: Add Repository for Apt
       block:
       - name: Add GPG Keyring
@@ -21,3 +31,9 @@
         update_cache: yes
         pkg:
         - redis
+
+    - name: Make sure a service unit is running
+      ansible.builtin.systemd:
+        state: started
+        enabled: true
+        name: redis-server

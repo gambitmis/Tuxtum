@@ -1,0 +1,61 @@
+---
+- name: Generate Redis configuration file
+  hosts: "{{ target_host | default('localhost') }}"
+  vars:
+    bind: "0.0.0.0"
+    tcp_backlog: 65535
+    tcp_keepalive: 0
+    maxclients: 100000
+    maxmemory_policy: allkeys-lru
+    io_threads: 10
+    io_threads_read: "yes"
+
+  tasks:
+  - name: Copy Redis configuration template
+    ansible.builtin.template:
+      src: redis.conf.j2
+      dest: /etc/redis/redis.conf
+    notify:
+    - Restart Redis
+
+  - name: check and create /etc/redis/conf.d
+    block:
+      - name: Check if conf.d exists
+        stat:
+          path: /etc/redis/conf.d
+        register: redis_confd_stat
+      - name: Create redis.conf if it doesn't exist
+        file:
+          path: "/etc/redis/conf.d"
+          state: directory
+          mode: "0760"
+          owner: redis
+          group: redis
+        when: not redis_confd_stat.stat.exists
+
+  - name: check and create /etc/redis/conf.d/auth.conf
+    block:
+      - name: Check if auth.conf exists
+        stat:
+          path: /etc/redis/conf.d/auth.conf
+        register: redis_conf_auth_stat
+      - name: Create redis.conf if it doesn't exist
+        file:
+          path: "/etc/redis/conf.d/auth.conf"
+          state: touch
+          mode: "0760"
+          owner: redis
+          group: redis
+        when: not redis_conf_auth_stat.stat.exists
+      - name: Copy Redis Auth configuration template
+        template:
+          src: redis-auth.j2
+          dest: /etc/redis/conf.d/auth.conf
+        notify:
+          - Restart Redis
+
+  handlers:
+    - name: Restart Redis
+      service:
+        name: redis-server
+        state: restarted

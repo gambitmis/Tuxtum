@@ -1,0 +1,74 @@
+---
+- name: Modify Sysctl
+  hosts: "{{ target_host | default('localhost') }}"
+  tasks:
+    
+  - name: To ensure the Linux kernel feature Transparent Huge Pages does not impact Redis memory usage and latency
+    ansible.builtin.shell: echo never > /sys/kernel/mm/transparent_hugepage/enabled
+
+  - name: check and create /etc/sysctl.d/redis.conf
+    block:
+      - name: Check if redis.conf exists
+        stat:
+          path: /etc/sysctl.d/redis.conf
+        register: redis_conf_stat
+      - name: Create redis.conf if it doesn't exist
+        file:
+          path: "/etc/sysctl.d/redis.conf"
+          state: touch
+          mode: "0644"
+        when: not redis_conf_stat.stat.exists
+
+  - name: Set the Linux kernel overcommit memory 
+    ansible.posix.sysctl:
+      name: vm.overcommit_memory
+      value: '1'
+      sysctl_set: true
+      state: present
+      reload: true
+      sysctl_file: /etc/sysctl.d/redis.conf
+
+  - name: Set Linux that determines the maximum number of connections that can be queued in the TCP/IP stack backlog per socket.
+    ansible.posix.sysctl:
+      name: net.core.somaxconn
+      value: '65535'
+      sysctl_set: true
+      state: present
+      reload: true
+      sysctl_file: /etc/sysctl.d/redis.conf
+
+  - name: Increase the read buffer size.
+    ansible.posix.sysctl:
+      name: net.core.rmem_default
+      value: '1048576'
+      sysctl_set: true
+      state: present
+      reload: true
+      sysctl_file: /etc/sysctl.d/redis.conf
+
+  - name: Increase the Max read buffer size.
+    ansible.posix.sysctl:
+      name: net.core.rmem_max
+      value: '16777216'
+      sysctl_set: true
+      state: present
+      reload: true
+      sysctl_file: /etc/sysctl.d/redis.conf
+
+  - name: Increase the write buffer size.
+    ansible.posix.sysctl:
+      name: net.core.wmem_default 
+      value: '1048576'
+      sysctl_set: true
+      state: present
+      reload: true
+      sysctl_file: /etc/sysctl.d/redis.conf
+
+  - name: Increase the Max write buffer size.
+    ansible.posix.sysctl:
+      name: net.core.wmem_max 
+      value: '16777216'
+      sysctl_set: true
+      state: present
+      reload: true
+      sysctl_file: /etc/sysctl.d/redis.conf

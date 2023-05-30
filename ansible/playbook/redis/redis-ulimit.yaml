@@ -1,0 +1,22 @@
+---
+- name: Modify Sysctl
+  hosts: "{{ target_host | default('localhost') }}"
+  tasks:
+
+  - name: Add or modify memlock, both soft and hard, limit for the user james with a comment
+    community.general.pam_limits:
+      domain: '*'
+      limit_type: '-'
+      limit_item: nproc
+      value: 1000000
+      #value: unlimited
+      #use_max: true
+
+  - name: Add or modify memlock, both soft and hard, limit for the user james with a comment
+    community.general.pam_limits:
+      domain: '*'
+      limit_type: '-'
+      limit_item: nofile
+      value: 1000000
+      #value: unlimited
+      #use_max: true
