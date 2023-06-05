@@ -1,0 +1,36 @@
+---
+- name: REDIS | Apt for Prerequisites
+  ansible.builtin.apt:
+    update_cache: yes
+    pkg:
+    - lsb-release
+    
+- name: REDIS | Check Redis GPG Key
+  ansible.builtin.stat:
+    path: /usr/share/keyrings/redis-archive-keyring.gpg
+  register: redis_gpg
+
+- name: REDIS | Delete Old Redis GPG key
+  ansible.builtin.file:
+    path: /usr/share/keyrings/redis-archive-keyring.gpg
+    state: absent
+  when: redis_gpg.stat.exists
+
+- name: REDIS | Add Repository for Apt
+  block:
+  - name: Add GPG Keyring
+    ansible.builtin.shell: curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
+  - name:
+    ansible.builtin.shell: echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
+        
+- name: REDIS | Apt for Redis
+  ansible.builtin.apt:
+    update_cache: yes
+    pkg:
+    - redis
+
+- name: REDIS | Make sure a service unit is running
+  ansible.builtin.systemd:
+    state: started
+    enabled: true
+    name: redis-server

@@ -1,0 +1,6 @@
+---
+# tasks file for redis
+- name: REDIS | Install
+  include: apt-redis.yaml
+  tags:
+    - install
