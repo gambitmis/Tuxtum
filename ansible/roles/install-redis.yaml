@@ -1,0 +1,6 @@
+---
+- hosts: "{{ target_host | default('localhost') }}"
+  become: true
+  gather_facts: true
+  roles:
+    - redis
