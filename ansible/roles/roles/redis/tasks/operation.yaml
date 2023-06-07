@@ -1,0 +1,9 @@
+---
+- name: REDIS | Restart
+  ansible.builtin.systemd:
+    state: restarted
+    enabled: true
+    name: redis-server
+  tags:
+  - restart
+  

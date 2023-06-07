@@ -1,2 +1,9 @@
 ---
 # defaults file for redis
+bind: "0.0.0.0"
+tcp_backlog: 65535
+tcp_keepalive: 0
+maxclients: 65500
+maxmemory_policy: allkeys-lru
+io_threads: 10
+io_threads_read: "yes"

@@ -1,6 +1,29 @@
 ---
 # tasks file for redis
 - name: REDIS | Install
-  include: apt-redis.yaml
+  include_tasks: apt-redis.yaml
   tags:
     - install
+
+- name: REDIS | Config
+  include_tasks: config-redis.yaml
+  tags:
+    - config
+
+- name: REDIS | Config Auth
+  include_tasks: config-auth.yaml
+  tags:
+    - auth
+
+- name: REDIS | Ulimit
+  include_tasks: config-ulimit.yaml
+  tags:
+    - ulimit
+
+- name: REDIS | Tuning
+  include_tasks: config-sysctl.yaml
+  tags:
+    - sysctl
+
+- name: REDIS | ADV Operation
+  include_tasks: operation.yaml

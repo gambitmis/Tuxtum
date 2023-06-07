@@ -1,0 +1,36 @@
+---  
+  - name: Add or modify memlock, both soft and hard, limit for all user
+    community.general.pam_limits:
+      domain: '*'
+      limit_type: '-'
+      limit_item: nproc
+      value: 65535
+      #value: unlimited
+      #use_max: true
+
+  - name: Add or modify memlock, both soft and hard, limit for all user
+    community.general.pam_limits:
+      domain: '*'
+      limit_type: '-'
+      limit_item: nofile
+      value: 65535
+      #value: unlimited
+      #use_max: true
+
+  - name: Add or modify memlock, both soft and hard, limit for root
+    community.general.pam_limits:
+      domain: 'root'
+      limit_type: '-'
+      limit_item: nproc
+      value: 65535
+      #value: unlimited
+      #use_max: true
+
+  - name: Add or modify memlock, both soft and hard, limit for root
+    community.general.pam_limits:
+      domain: 'root'
+      limit_type: '-'
+      limit_item: nofile
+      value: 65535
+      #value: unlimited
+      #use_max: true

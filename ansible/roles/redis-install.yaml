@@ -3,4 +3,6 @@
   become: true
   gather_facts: true
   roles:
-    - redis
+    - role: redis
+      vars:
+        tcp_keepalive: 10

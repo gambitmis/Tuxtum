@@ -1,0 +1,6 @@
+---
+- hosts: "{{ target_host | default('localhost') }}"
+  roles:
+    - role: test
+      vars:
+        test: "555"

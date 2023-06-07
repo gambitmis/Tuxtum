@@ -1,7 +1,7 @@
 ---
 # handlers file for redis
-- name: restart redis
-  service:
+- name: Restart Redis
+  ansible.builtin.systemd:
     name: redis-server
     state: restarted
-  when: redis_service_state != 'stopped'
+  #when: redis_service_state != 'stopped'
