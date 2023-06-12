@@ -1,0 +1,8 @@
+---
+- hosts: "{{ target_host | default('localhost') }}"
+  become: true
+  gather_facts: true
+  roles:
+    - role: mongodb
+      #vars:
+        #job: install

@@ -1,0 +1,41 @@
+# Apt for Mongodb
+---
+- name: Mongodb | Apt for Prerequisites
+  ansible.builtin.apt:
+    update_cache: yes
+    pkg:
+    - gnupg
+
+- name: Mongodb | Check Mongodb GPG Key
+  ansible.builtin.stat:
+    path: /usr/share/keyrings/mongodb-server-6.0.gpg
+  register: mongodb_gpg
+
+- name: Mongodb | Delete Old Mongodb GPG key
+  ansible.builtin.file:
+    path: /usr/share/keyrings/mongodb-server-6.0.gpg
+    state: absent
+  when: mongodb_gpg.stat.exists
+
+- name: Mongodb | Add Repository for Apt
+  block:
+  - name: Add GPG Keyring
+    ansible.builtin.shell: curl -fsSL https://pgp.mongodb.com/server-6.0.asc | sudo gpg -o /usr/share/keyrings/mongodb-server-6.0.gpg --dearmor
+  - name: Add Mongodb repo
+    ansible.builtin.shell: echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+
+- name: Mongodb | Apt for Mongodb
+  ansible.builtin.apt:
+    update_cache: yes
+    pkg:
+    - mongodb-org={{ mongodb_version }}
+    - mongodb-org-database={{ mongodb_version }}
+    - mongodb-org-server={{ mongodb_version }} 
+    - mongodb-org-mongos={{ mongodb_version }}
+    - mongodb-org-tools={{ mongodb_version }}
+
+- name: Mongodb | Make sure a service unit is running
+  ansible.builtin.systemd:
+    state: started
+    enabled: true
+    name: mongod

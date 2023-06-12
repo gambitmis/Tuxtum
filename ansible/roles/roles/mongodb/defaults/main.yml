@@ -1,0 +1,4 @@
+---
+# defaults file for mongodb
+job: "info"
+mongodb_version: 6.0.4

@@ -1,0 +1,20 @@
+---
+# tasks file for Mongodb
+- name: mongodb | Info
+  block:
+   - debug:   
+       msg: "Welcome to Ansible for Mongodb Please assign job to work"
+   - debug: 
+       msg: "Working on Hostname:{ {{ inventory_hostname }} } Distribution:{ {{ ansible_distribution }} {{ ansible_distribution_version }} } Operation Time:{ {{ ansible_date_time.date }} {{ ansible_date_time.time }} {{ ansible_date_time.tz }} }"
+   - debug:
+       msg: "Hostname:{ {{ inventory_hostname }} } IPAddr:{ {{ ansible_all_ipv4_addresses }} } Gateway:{ {{ ansible_default_ipv4.gateway }} }"      
+  when: 
+    - job == "info"
+    - ansible_default_ipv4.gateway is defined
+    - ansible_all_ipv4_addresses is defined
+
+- name: mongodb | Install
+  include_tasks: apt-mongodb.yaml
+  tags:
+    - install
+  when: job == "install"
