@@ -18,3 +18,9 @@
   tags:
     - install
   when: job == "install"
+
+- name: mongodb | Init Admin User
+  include_tasks: init-user.yaml
+  tags:
+    - init-admin
+  when: job == "install"

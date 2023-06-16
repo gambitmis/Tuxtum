@@ -1,0 +1,14 @@
+systemLog:
+   destination: file
+   path: "/var/log/mongodb/mongod.log"
+   logAppend: true
+storage:
+   journal:
+      enabled: true
+processManagement:
+   fork: true
+net:
+   bindIp: {{ bind | default('0.0.0.0') }}
+   port: {{ port | default('27017') }}
+setParameter:
+   enableLocalhostAuthBypass: false

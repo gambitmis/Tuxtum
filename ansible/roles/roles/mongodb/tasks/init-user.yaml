@@ -1,0 +1,9 @@
+---
+- name: Define roles
+  community.mongodb.mongodb_user:
+    database: admin
+    name: "{{ admin_user }}"
+    password: "{{ admin_passwd }}"
+    roles: root
+    state: present
+
